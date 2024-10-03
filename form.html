@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Feedback</title>
+    <style>
+        label { float: left; width: 150px; }
+        #container { width: 700px; margin: auto; background-color: beige; }
+        main { padding: 50px; }
+        input.error { border: 1px solid red; }
+        #recordTable { display: none; margin-top: 20px; }
+    </style>
+</head>
+<body>
+<div id="container">
+    <main>
+        <h2>Feedback</h2>
+        <h3>Love something? Hate something? Let us know!</h3>
+        Note: Fields marked with an asterisk (*) are mandatory
+        <br><br>
+        <form id="feedbackForm" method="post" novalidate>
+            <label>Title*:</label>
+            <input type="radio" name="title" id="miss" value="miss" required />Miss
+            <input type="radio" name="title" id="mr" value="mr" required />Mr.
+            <input type="radio" name="title" id="mrs" value="mrs" required />Mrs.
+            <br><br>
+
+            <label for="street1">Street Address 1*:</label>
+            <input type="text" name="street1" id="street1" placeholder="Street Address 1" maxlength="25" oninput="updateSubmitButton()" required />
+            <br><br>
+
+            <label for="street2">Street Address 2:</label>
+            <input type="text" name="street2" id="street2" placeholder="Street Address 2" maxlength="25" oninput="updateSubmitButton()" />
+            <br><br>
+
+            <label for="firstName">First Name*:</label>
+            <input type="text" name="firstName" id="firstName" placeholder="First Name" maxlength="25" oninput="updateSubmitButton()" required />
+            <br><br>
+
+            <label for="lastName">Last Name*:</label>
+            <input type="text" name="lastName" id="lastName" placeholder="Last Name" maxlength="25" oninput="updateSubmitButton()" required />
+            <br><br>
+
+            <label for="emailId">Email Id*:</label>
+            <input type="text" name="emailId" id="emailId" placeholder="yourname@domain.com" maxlength="25" oninput="updateSubmitButton()" required />
+            <br><br>
+
+            <label for="phoneNumber">Phone Number*:</label>
+            <input type="text" name="phoneNumber" id="phoneNumber" placeholder="xxx-xxx-xxxx" maxlength="12" oninput="this.value=this.value.replace(/[^0-9]/g,''); updateSubmitButton()" required />
+            <br><br>
+
+            <label for="zipcode">ZipCode*:</label>
+            <input type="text" name="zipcode" id="zipcode" placeholder="xxxxxx" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,''); updateSubmitButton()" required />
+            <br><br>
+
+            <label for="source">How did you hear*:</label>
+            <input type='checkbox' name="source" value="facebook" /> Facebook
+            <input type='checkbox' name="source" value="google" /> Google
+            <input type='checkbox' name="source" value="yelp" /> Yelp
+            <br><br>
+
+            <label for="dynamicOptions">Favourite Beverage:</label>
+            <select id="dynamicOptions" onchange="handleListBoxChange(this)">
+                <option>Select your choice for coffee</option>
+                <option>Iced Coffee</option>
+                <option>Expresso</option>
+                <option>Cold Brew</option>
+                <option>Americano</option>
+                <option>Latte</option>
+            </select>
+            <div id="checkboxesContainer"></div>
+            <br>
+
+            <label for="comments">Comments*:</label>
+            <textarea name="text" id="comments" placeholder="Your comments" rows="5" cols="25" maxlength="25" oninput="updateSubmitButton()" required></textarea>
+            <br><br>
+
+            <input type="submit" id="submitBtn" disabled />
+            <input type="reset" />
+            <br><br>
+        </form>
+
+        <table border="1" id="recordTable">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Street Address 1</th>
+                    <th>Street Address 2</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Zip Code</th>
+                    <th>Comments</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </main>
+</div>
+
+<script>
+function validateFields() {
+    const fields = [
+        { id: 'street1', required: true },
+        { id: 'firstName', required: true },
+        { id: 'lastName', required: true },
+        { id: 'emailId', required: true },
+        { id: 'phoneNumber', required: true },
+        { id: 'zipcode', required: true },
+        { id: 'comments', required: true }
+    ];
+
+    let isValid = true;
+
+    fields.forEach(field => {
+        const input = document.getElementById(field.id);
+        const value = input.value.trim();
+
+        if (field.required && (!value || value.length < 1)) {
+            isValid = false;
+            colorChangeTextBox(input, false);
+        } else {
+            colorChangeTextBox(input, true);
+        }
+
+        if (field.id === 'emailId' && value) {
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@northeastern\.edu$/;
+            if (!emailRegex.test(value)) {
+                isValid = false;
+                colorChangeTextBox(input, false);
+            }
+        }
+    });
+
+    return isValid;
+}
+
+function colorChangeTextBox(input, isValid) {
+    if (isValid) {
+        input.classList.remove('error');
+    } else {
+        input.classList.add('error');
+    }
+}
+
+function updateSubmitButton() {
+    const submitBtn = document.getElementById('submitBtn');
+    const isValid = validateFields();
+    submitBtn.disabled = !isValid;
+}
+
+function handleListBoxChange(select) {
+    const selectedValue = select.value;
+    const checkboxesContainer = document.getElementById('checkboxesContainer');
+
+    checkboxesContainer.innerHTML = '';
+
+    if (selectedValue !== 'Select an option') {
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = 'dynamicCheckbox';
+        checkbox.onchange = function() { toggleTextField(this); };
+
+        const label = document.createElement('label');
+        label.htmlFor = 'dynamicCheckbox';
+        label.textContent = `Enable ${selectedValue}`;
+
+        checkboxesContainer.appendChild(checkbox);
+        checkboxesContainer.appendChild(label);
+    }
+}
+
+function toggleTextField(checkbox) {
+    let textField = document.getElementById('dynamicTextField');
+
+    if (!textField) {
+        textField = document.createElement('input');
+        textField.type = 'text';
+        textField.id = 'dynamicTextField';
+        textField.placeholder = 'Enter additional info';
+        textField.maxLength = 25;
+        textField.oninput = updateSubmitButton;
+        document.getElementById('checkboxesContainer').appendChild(textField);
+    }
+
+    textField.style.display = checkbox.checked ? 'block' : 'none';
+}
+
+function recordSubmission(event) {
+    event.preventDefault();
+    const tableBody = document.getElementById('recordTable').querySelector('tbody');
+    const newRow = document.createElement('tr');
+
+    const title = document.querySelector('input[name="title"]:checked').value;
+    const fields = ['street1', 'street2', 'firstName', 'lastName', 'emailId', 'phoneNumber', 'zipcode', 'comments'];
+
+    newRow.appendChild(createTableCell(title));
+
+    fields.forEach(field => {
+        const value = document.getElementById(field).value.trim();
+        newRow.appendChild(createTableCell(value));
+    });
+
+    tableBody.appendChild(newRow);
+    document.getElementById('recordTable').style.display = 'table'; // Show the table
+    clearForm();
+}
+
+function createTableCell(value) {
+    const td = document.createElement('td');
+    td.textContent = value;
+    return td;
+}
+
+function clearForm() {
+    const form = document.getElementById('feedbackForm');
+    form.reset();
+    document.getElementById('submitBtn').disabled = true;
+    const dynamicTextField = document.getElementById('dynamicTextField');
+    if (dynamicTextField) {
+        dynamicTextField.style.display = 'none';
+    }
+    updateSubmitButton();
+}
+
+document.getElementById('feedbackForm').addEventListener('submit', recordSubmission);
+</script>
+
+</body>
+</html>
